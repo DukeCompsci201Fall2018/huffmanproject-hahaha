@@ -69,14 +69,6 @@ public class HuffProcessor {
 		HuffNode root = readTreeHeader(in);
 		ReadCompressedBits(root, in, out);
 		out.close();
-
-		while (true){
-			int val = in.readBits(BITS_PER_WORD);
-			if (val == -1) {
-				throw new HuffException("Reading bits fails! -1 returned");
-			}
-			out.writeBits(BITS_PER_WORD, val);
-		}
 	}
 
 	/**
@@ -97,6 +89,8 @@ public class HuffProcessor {
 			current = (bit == 0)? current.myLeft : current.myRight;
 
 			// value
+			System.out.println(current == null);
+			System.out.println(current.myValue);
 			if (current.myValue != 0) {
 
 				if (current.myValue == PSEUDO_EOF)
@@ -117,6 +111,7 @@ public class HuffProcessor {
 	private HuffNode readTreeHeader(BitInputStream in) {
 
 		int bit = in.readBits(1);
+		System.out.println(bit);
 
 		switch (bit){
 			case -1:
@@ -127,15 +122,10 @@ public class HuffProcessor {
 				HuffNode right = readTreeHeader(in);
 				return new HuffNode(0, 0, left, right);
 
-			case 1:
+			default:
 				int value = in.readBits(BITS_PER_WORD + 1);
+				System.out.println(value);
 				return new HuffNode(value, 0, null, null);
-
-			case PSEUDO_EOF:
-				return null;
-
-				default:
-					throw new HuffException("Unpredicted bit reading! Check the input file");
 		}
 
 	}
