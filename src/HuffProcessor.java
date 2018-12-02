@@ -61,10 +61,82 @@ public class HuffProcessor {
 	 */
 	public void decompress(BitInputStream in, BitOutputStream out){
 
+		int bits = in.readBits(BITS_PER_INT);
+		if (bits != HUFF_TREE) {
+			throw new HuffException("Illegal header starts with " + bits);
+		}
+
+		HuffNode root = readTreeHeader(in);
+		ReadCompressedBits(root, in, out);
+		out.close();
+
 		while (true){
 			int val = in.readBits(BITS_PER_WORD);
-			if (val == -1) break;
+			if (val == -1) {
+				throw new HuffException("Reading bits fails! -1 returned");
+			}
 			out.writeBits(BITS_PER_WORD, val);
 		}
+	}
+
+	/**
+	 * Read the compressed file.
+	 * @param root Huffman coding tree
+	 * @param in input stream
+	 * @param out output stream
+	 */
+
+	private void ReadCompressedBits(HuffNode root, BitInputStream in, BitOutputStream out) {
+		HuffNode current = root;
+
+		while (true) {
+			// tree traversal
+			int bit = in.readBits(1);
+			if (bit == -1)
+					throw new HuffException("Reading bit fails! -1 returned");
+			current = (bit == 0)? current.myLeft : current.myRight;
+
+			// value
+			if (current.myValue != 0) {
+
+				if (current.myValue == PSEUDO_EOF)
+					break;
+				else {
+					out.writeBits(BITS_PER_WORD + 1, current.myValue);
+					current = root;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Read the coding tree.
+	 * @param in Buffered bit stream of coding tree.
+	 * @return coding tree.
+	 */
+	private HuffNode readTreeHeader(BitInputStream in) {
+
+		int bit = in.readBits(1);
+
+		switch (bit){
+			case -1:
+				throw new HuffException("Reading bit fails! -1 returned");
+
+			case 0:
+				HuffNode left = readTreeHeader(in);
+				HuffNode right = readTreeHeader(in);
+				return new HuffNode(0, 0, left, right);
+
+			case 1:
+				int value = in.readBits(BITS_PER_WORD + 1);
+				return new HuffNode(value, 0, null, null);
+
+			case PSEUDO_EOF:
+				return null;
+
+				default:
+					throw new HuffException("Unpredicted bit reading! Check the input file");
+		}
+
 	}
 }
