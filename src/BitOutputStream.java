@@ -121,6 +121,7 @@ public class BitOutputStream extends OutputStream {
 	 * @param value is the value written
 	 */
 	@Override
+	@Deprecated
 	public void write(int value) {
 		throw new HuffException("Do Not Call This Method, call writeBits");
 	}
