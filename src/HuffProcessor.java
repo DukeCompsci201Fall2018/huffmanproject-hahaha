@@ -177,14 +177,14 @@ public class HuffProcessor {
 
 			// value
 			// FIXME: remove testing outputs
-			System.out.println(current == null);
-			System.out.println(current.myValue);
+//			System.out.println(current == null);
+//			System.out.println(current.myValue);
 			if (current.myValue != 0) {
 
 				if (current.myValue == PSEUDO_EOF)
 					break;
 				else {
-					out.writeBits(BITS_PER_WORD + 1, current.myValue);
+					out.writeBits(BITS_PER_WORD, current.myValue);
 					current = root;
 				}
 			}
@@ -200,7 +200,7 @@ public class HuffProcessor {
 
 		int bit = in.readBits(1);
 		//FIXME: delete the debugging output
-		System.out.println(bit);
+//		System.out.println(bit);
 
 		switch (bit){
 			case -1:
