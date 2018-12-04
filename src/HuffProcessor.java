@@ -176,11 +176,8 @@ public class HuffProcessor {
 			current = (bit == 0)? current.myLeft : current.myRight;
 
 			// value
-			// FIXME: remove testing outputs
-//			System.out.println(current == null);
-//			System.out.println(current.myValue);
+			if (current == null) return;
 			if (current.myValue != 0) {
-
 				if (current.myValue == PSEUDO_EOF)
 					break;
 				else {
@@ -199,8 +196,6 @@ public class HuffProcessor {
 	private HuffNode readTreeHeader(BitInputStream in) {
 
 		int bit = in.readBits(1);
-		//FIXME: delete the debugging output
-//		System.out.println(bit);
 
 		switch (bit){
 			case -1:
@@ -213,7 +208,8 @@ public class HuffProcessor {
 
 			default:
 				int value = in.readBits(BITS_PER_WORD + 1);
-				System.out.println(value);
+				// FIXME: delete this
+//				System.out.println(value);
 				return new HuffNode(value, 0, null, null);
 		}
 
