@@ -95,6 +95,9 @@ public class HuffProcessor {
 	private void codingHelper(HuffNode root, String s, String[] encodings) {
 		if (root.myLeft == null && root.myRight == null) {
 			encodings[root.myValue] = s;
+			if (myDebugLevel >= DEBUG_HIGH) {
+				System.out.printf("encoding for %d is %s\n", root.myValue, s);
+			}
 			return;
 		}
 
@@ -112,6 +115,9 @@ public class HuffProcessor {
 		}
 
 		while (pq.size() > 1) {
+			if (myDebugLevel >= DEBUG_HIGH) {
+				System.out.printf("pq created with %d nodes\n", pq.size());
+			}
 			HuffNode left = pq.remove();
 			HuffNode right = pq.remove();
 			HuffNode t = new HuffNode(0, left.myWeight + right.myWeight, left, right);
@@ -209,8 +215,6 @@ public class HuffProcessor {
 
 			default:
 				int value = in.readBits(BITS_PER_WORD + 1);
-				// FIXME: delete this
-//				System.out.println(value);
 				return new HuffNode(value, 0, null, null);
 		}
 
