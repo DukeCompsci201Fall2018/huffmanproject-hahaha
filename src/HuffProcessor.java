@@ -68,11 +68,7 @@ public class HuffProcessor {
 		}
 
 		String code = codings[PSEUDO_EOF];
-		if (code.equals("")) {
-			out.writeBits(1,1);
-		} else {
-			out.writeBits(code.length(), Integer.parseInt(code, 2));
-		}
+		out.writeBits(code.length(), Integer.parseInt(code, 2));
 	}
 
 	private void writeHeader(HuffNode root, BitOutputStream out) {
@@ -97,8 +93,7 @@ public class HuffProcessor {
 	}
 
 	private void codingHelper(HuffNode root, String s, String[] encodings) {
-
-		if (root.myValue != 0) {
+		if (root.myLeft == null && root.myRight == null) {
 			encodings[root.myValue] = s;
 			return;
 		}
@@ -133,8 +128,6 @@ public class HuffProcessor {
 		int[] freq = new int[ALPH_SIZE + 1];
 		
 		int vals = in.readBits(BITS_PER_WORD);
-		// FIXME: delete this
-		System.out.println(vals);
 		while (vals != -1) {
 			freq[vals] ++;
 			vals = in.readBits(BITS_PER_WORD);
@@ -179,17 +172,18 @@ public class HuffProcessor {
 			// tree traversal
 			int bit = in.readBits(1);
 			if (bit == -1)
-					throw new HuffException("Reading bit fails! -1 returned");
-			current = (bit == 0)? current.myLeft : current.myRight;
+				throw new HuffException("Reading bit fails! -1 returned");
+			else {
+				current = (bit == 0) ? current.myLeft : current.myRight;
 
-			// value
-			if (current == null) return;
-			if (current.myValue != 0) {
-				if (current.myValue == PSEUDO_EOF)
-					break;
-				else {
-					out.writeBits(BITS_PER_WORD, current.myValue);
-					current = root;
+				// value
+				if (current.myLeft == null && current.myRight == null) {
+					if (current.myValue == PSEUDO_EOF)
+						break;
+					else {
+						out.writeBits(BITS_PER_WORD, current.myValue);
+						current = root;
+					}
 				}
 			}
 		}
