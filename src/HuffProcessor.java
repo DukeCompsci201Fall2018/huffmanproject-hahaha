@@ -68,7 +68,11 @@ public class HuffProcessor {
 		}
 
 		String code = codings[PSEUDO_EOF];
-		out.writeBits(code.length(), Integer.parseInt(code, 2));
+		if (code.equals("")) {
+			out.writeBits(1,1);
+		} else {
+			out.writeBits(code.length(), Integer.parseInt(code, 2));
+		}
 	}
 
 	private void writeHeader(HuffNode root, BitOutputStream out) {
@@ -93,6 +97,7 @@ public class HuffProcessor {
 	}
 
 	private void codingHelper(HuffNode root, String s, String[] encodings) {
+
 		if (root.myValue != 0) {
 			encodings[root.myValue] = s;
 			return;
@@ -128,6 +133,8 @@ public class HuffProcessor {
 		int[] freq = new int[ALPH_SIZE + 1];
 		
 		int vals = in.readBits(BITS_PER_WORD);
+		// FIXME: delete this
+		System.out.println(vals);
 		while (vals != -1) {
 			freq[vals] ++;
 			vals = in.readBits(BITS_PER_WORD);
